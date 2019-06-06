@@ -1,3 +1,11 @@
+# Custom
+# exclude backups
+/backups/*.ios
+# exclude images
+/images/*.bin
+# exclude iplists
+/iplists/*.ip
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

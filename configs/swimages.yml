@@ -1,0 +1,41 @@
+# LiamJordan. For support: lsjordan.uk@gmail.com
+
+# Switch image information. Stored per family of switches.
+
+C2960+:
+  lanlite:
+    image: c2960-lanlitek9-mz.152-4.E7.bin
+    MD5: b1ea7d5b7deca43e492282d477d45316
+    version: 15.2(4)E7
+  lanbase:
+    image: c2960-lanbasek9-mz.152-4.E7.bin
+    MD5: f9eda18e78ebb046dd8ad75f0f244219
+    version: 15.2(4)E7
+
+C2960C:
+  universal:
+    image: c2960c405-universalk9-mz.152-2.E8.bin
+    MD5: 5c972c1dfdd6a57473dd7acb0a8ad1d1
+    version: 15.2(2)E8
+
+C2960:
+  lanlite:
+    image: c2960-lanlitek9-mz.122-55.SE12.bin
+    MD5: 1ac4728753bb11ad6f22fd8f54763f8e
+    version: 12.2(55)SE12
+  lanbase:
+    image: c2960-lanbasek9-mz.122-55.SE12.bin
+    MD5: 1504e5d9342eabf6f7b2376e94ace46f
+    version: 12.2(55)SE12
+
+C2960X:
+  universal:
+    image: c2960x-universalk9-mz.152-4.E7.bin
+    MD5: a7a2d1754104306a4556326a6f16227f
+    version: 15.2(4)E7
+
+C2960S:
+  universal:
+    image: c2960s-universalk9-mz.152-2.E9.bin
+    MD5: ea604d030b378b6c5c3dda3d501ac2f5
+    version: 15.2(2)E9

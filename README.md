@@ -5,23 +5,24 @@ Network switch OS upgrade tool. Primarily used for Cisco IOS
 In the default mode this tool will connect to a switch IP (or list of IP's) and gather all required information about the current OS version. It compares this to a simple config file, and displays if an OS upgrade is required. It also has copy, upgrade and reload modes, which can be used to fully automate the upgrade.
 
 ## Usage
-Execute /scripts/swupgrade.py
-swupgrade.py (--host HOST | --list LIST) [--user USER] [--copy]
-                    [--upgrade] [--reload] [--debug] [--help]
+Execute /scripts/swupgrade.py  
+
+swupgrade.py (--host HOST | --list LIST) [--user USER] [--copy][--upgrade] [--reload] [--debug] [--help]  
+
 
 switch upgrade utility
 
-optional arguments:
-  --host HOST  switch IP address
-  --list LIST  File containing list of switch IP addresses
-  --user USER  Username to connect
-  --copy       Copy upgrade files to devices
-  --upgrade    Execute remote upgrade
-  --reload     Reload switches post upgrade
-  --debug      Debug logging
-  --help       Show this help msg and exit
+optional arguments:  
+  --host HOST  switch IP address  
+  --list LIST  File containing list of switch IP addresses  
+  --user USER  Username to connect  
+  --copy       Copy upgrade files to devices  
+  --upgrade    Execute remote upgrade  
+  --reload     Reload switches post upgrade  
+  --debug      Debug logging  
+  --help       Show this help msg and exit  
 
-(c) 2019 Liam Jordan
+c) 2019 Liam Jordan  
 
 ## /backups/
 Used during the copy, upgrade and reload phases. The switch config is saved to file automatically, the backups directory is the default save location.

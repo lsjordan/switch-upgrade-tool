@@ -128,12 +128,12 @@ def check_upgrade(s, images, image_path="../images/"):
             msg_color = "green"
             upgrade_s = s
         elif not os.path.isfile(f"{image_path}{s.upgradefile}"):
-            type = "error"
+            type = "success"
             msg = f"upgrade to {s.next_version} - upgrade file not available"
             msg_color = "red"
         elif not int(os.stat(f"{image_path}{s.upgradefile}").st_size) < int(
                 s.free_space()):
-            type = "error"
+            type = "success"
             msg = f"upgrade to {s.next_version} - not enough space on flash"
             msg_color = "red"
         else:

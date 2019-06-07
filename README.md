@@ -1,2 +1,2 @@
 # switch-upgrade-tool
-Upgrade network switch OS. Primarily used for Cisco IOS
+Network switch OS upgrade tool. Primarily used for Cisco IOS

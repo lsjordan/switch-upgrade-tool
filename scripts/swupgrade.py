@@ -12,7 +12,6 @@ import os
 import netmiko
 import yaml
 from packaging import version
-
 from logger import Logger
 from netdevices import Switch as s
 
@@ -25,16 +24,16 @@ class SwitchNotSupported(Exception):
 def parse_arguments():
     """Manage arguments and help file"""
     parser = argparse.ArgumentParser(
-        description="switch upgrade utility",
+        description="switch upgrade tool",
         epilog="(c) 2019 Liam Jordan",
         fromfile_prefix_chars="@",
         add_help=False,
     )
     host = parser.add_mutually_exclusive_group(required=True)
-    host.add_argument("--host", help="switch IP address", action="append")
+    host.add_argument("--host", help="switch IP address")
     host.add_argument("--list",
                       help="File containing list of switch IP addresses")
-    parser.add_argument("--user", help="Username to connect", default="italik")
+    parser.add_argument("--user", help="Username to connect", required=True)
     parser.add_argument("--copy",
                         help="Copy upgrade files to devices",
                         action="store_true")
@@ -57,8 +56,7 @@ def validate_hosts(args):
     hosts = []
     valid = []
     if args.host:
-        for host in args.host:
-            hosts.append(host)
+        hosts.append(args.host)
     elif args.list:
         with open(f"../iplists/{args.list}") as f:
             mylist = f.read().splitlines()

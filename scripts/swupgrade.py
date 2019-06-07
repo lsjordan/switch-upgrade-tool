@@ -91,9 +91,9 @@ def yaml_loader(filepath):
         return yaml.load(myfile)
 
 
-def print_result(host, type, info, msg, msg_color, debug_on=False):
+def print_result(host, type, info, msg, msg_color):
     """print the information from check_upgrade to the user"""
-    s_log = Logger(host, debug_on=debug_on)
+    s_log = Logger(host)
     if type == "error":
         s_log.error(info, msg, msg_color)
     elif type == "info":
@@ -104,7 +104,7 @@ def print_result(host, type, info, msg, msg_color, debug_on=False):
         s.log.error("Something went wrong")
 
 
-def check_upgrade(s, images, image_path="../images/", debug_on=False):
+def check_upgrade(s, images, image_path="../images/"):
     """Gathers information from switch and checks it against an images file.
     Will categorise the switch as either ready for file transfer or ready for
     upgrade. Returns both values, one will be empty"""
@@ -158,12 +158,13 @@ def check_upgrade(s, images, image_path="../images/", debug_on=False):
         info = f"[{ke}]"
         msg = "Family not defined, check ../configs/swimages.yml"
         msg_color = "red"
-    print_result(host=s.host,
-                 type=type,
-                 info=info,
-                 msg=msg,
-                 msg_color=msg_color,
-                 debug_on=debug_on)
+    print_result(
+        host=s.host,
+        type=type,
+        info=info,
+        msg=msg,
+        msg_color=msg_color,
+    )
     return copy_s, upgrade_s
 
 
@@ -214,14 +215,12 @@ def main(args):
     images = yaml_loader("../configs/swimages.yml")
     password = getpass.getpass("Password: ")
     for host in host_list:
-        sw = s(host, args.user, password)
-        (copy_s, upgrade_s) = check_upgrade(sw, images, debug_on=args.debug)
+        sw = s(host, args.user, password, debug_on=args.debug)
+        (copy_s, upgrade_s) = check_upgrade(sw, images)
         if copy_s is not None:
             copy_list.append(copy_s)
         if upgrade_s is not None:
             upgrade_list.append(upgrade_s)
-    for host in copy_list:
-        print(host.host)
     if args.copy:
         upgrade_list.append(copy_file(copy_list))
     if args.upgrade:

@@ -241,12 +241,10 @@ def main(args):
             upgrade_list.append(upgrade_s)
     if args.copy:
         success = copy_file(copy_list, log)
-        if len(success) != 0:
-            upgrade_list.append(sw), ({} for sw in success)
+        upgrade_list.append(sw), ({} for sw in success)
     if args.upgrade:
         success = upgrade_switches(upgrade_list, log)
-        if len(success) != 0:
-            reload_list.append(sw), ({} for sw in success)
+        reload_list.append(sw), ({} for sw in success)
     if args.reload:
         reload_switches(reload_list, log)
 

@@ -58,10 +58,14 @@ def validate_hosts(args):
     if args.host:
         hosts.append(args.host)
     elif args.list:
-        with open(f"../iplists/{args.list}") as f:
-            mylist = f.read().splitlines()
-            for item in mylist:
-                hosts.append(item)
+        try:
+            with open(f"../iplists/{args.list}") as f:
+                mylist = f.read().splitlines()
+                for item in mylist:
+                    hosts.append(item)
+        except FileNotFoundError as e:
+            log.error(e)
+            quit()
     for host in hosts:
         try:
             ipaddress.ip_address(host)
@@ -83,10 +87,14 @@ def supported_switch(s):
     return True
 
 
-def yaml_loader(filepath):
+def yaml_loader(filepath, log):
     """Load a yaml file"""
-    with open(filepath, "r") as myfile:
-        return yaml.load(myfile)
+    try:
+        with open(filepath, "r") as myfile:
+            return yaml.load(myfile)
+    except FileNotFoundError as e:
+        log.error(e)
+        quit()
 
 
 def print_result(host, type, info, msg, msg_color):
@@ -166,38 +174,50 @@ def check_upgrade(s, images, image_path="../images/"):
     return copy_s, upgrade_s
 
 
-def copy_file(switch_list):
+def copy_file(switch_list, log):
     """Transfers the s.upgradefile from local directory to switch flash, for a
     list of switches. Returns a list of successful switches."""
     success = []
     for switch in switch_list:
+        log.info(f"{switch.host} - Preparing to copy file...")
         switch.save_config()
         switch.backup_config()
         switch.send_config("ip scp server enable")
         if switch.send_file(f"{switch.image_path}{switch.upgradefile}",
                             f"flash:/{switch.upgradefile}"):
+            log.success(f"{switch.host} - Copy success")
             success.append(switch)
+        else:
+            log.error(f"{switch.host} - Copy failed")
     return success
 
 
-def upgrade_switches(switch_list):
+def upgrade_switches(switch_list, log):
     """Sends an upgrade configuration to a switch, for a list of switches.
     Returns a list of successful switches"""
     success = []
     for switch in switch_list:
+        log.info(f"{switch.host} - Preparing to upgrade...")
         switch.save_config()
         switch.backup_config()
         if switch.send_config(f"boot system flash:/{switch.upgradefile}"):
+            log.success(f"{switch.host} - Upgrade success")
             success.append(switch)
+        else:
+            log.error(f"{switch.host} - Upgrade failed")
     return success
 
 
-def reload_switches(switch_list):
+def reload_switches(switch_list, log):
     """Sends a reload command to a switch, for a list of switches"""
     for switch in switch_list:
+        log.info(f"{switch.host} - Preparing to reload...")
         switch.save_config()
         switch.backup_config()
-        switch.reload()
+        if switch.reload():
+            log.success(f"{switch.host} - Reload success, reloading in 5 mins")
+        else:
+            log.error(f"{switch.host} - Reload failed")
     return True
 
 
@@ -210,7 +230,7 @@ def main(args):
     copy_list = []
     upgrade_list = []
     reload_list = []
-    images = yaml_loader("../configs/swimages.yml")
+    images = yaml_loader("../configs/swimages.yml", log)
     password = getpass.getpass("Password: ")
     for host in host_list:
         sw = s(host, args.user, password, debug_on=args.debug)
@@ -220,11 +240,15 @@ def main(args):
         if upgrade_s is not None:
             upgrade_list.append(upgrade_s)
     if args.copy:
-        upgrade_list.append(copy_file(copy_list))
+        success = copy_file(copy_list, log)
+        if len(success) != 0:
+            upgrade_list.append(sw), ({} for sw in success)
     if args.upgrade:
-        reload_list.append(upgrade_switches(upgrade_list))
+        success = upgrade_switches(upgrade_list, log)
+        if len(success) != 0:
+            reload_list.append(sw), ({} for sw in success)
     if args.reload:
-        reload_switches(reload_list)
+        reload_switches(reload_list, log)
 
 
 if __name__ == "__main__":

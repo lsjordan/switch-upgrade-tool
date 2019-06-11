@@ -61,6 +61,9 @@ class Switch:
                 password=self.password,
                 device_type=self.type,
             )
+        if not self.connect.is_alive():
+            self.connect = None
+            self.connect = self.ssh()
         self.log.debug("[ssh] complete")
         return self.connect
 

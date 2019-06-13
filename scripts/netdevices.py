@@ -5,15 +5,17 @@ LiamJordan. For support: lsjordan.uk@gmail.com
 A file containing network device classes
 """
 
-# TODO: prereqs
-# TODO: testing
-
 from logger import Logger
 from netmiko import ConnectHandler
 import time
 import datetime as dt
 import paramiko
 from scp import SCPClient
+
+
+class InvalidConfigCommand(Exception):
+    """Raised when the switch is not supported"""
+    pass
 
 
 def _progress(status, total, count):
@@ -248,7 +250,8 @@ class Switch:
     def send_config(self, command):
         """Sends the given configuration command string to the switch"""
         self.log.debug("Executing [send_config]")
-        self.ssh().send_config_set(command)
+        if "% Invalid input" in self.ssh().send_config_set(command):
+            raise InvalidConfigCommand(command)
         self.log.debug("[send_config] complete")
         return True
 

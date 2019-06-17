@@ -258,8 +258,9 @@ class Switch:
     def reload(self):
         """Reload the switch"""
         self.log.debug("Executing [reload]")
-        output = self.ssh().send_command_timing("reload in 5")
+        connect = self.ssh()
+        output = connect.send_command_timing("reload in 5")
         if "?" in output:
-            output += self.ssh().send_command_timing("y")
+            output += connect.send_command_timing("y")
         self.log.debug("[reload] complete")
         return True

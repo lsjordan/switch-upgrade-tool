@@ -21,6 +21,14 @@ class SwitchNotSupported(Exception):
     pass
 
 
+class global_arrays(object):
+    """Store required global arrays for access by functions"""
+    host_list = []
+    copy_list = []
+    upgrade_list = []
+    reload_list = []
+
+
 def parse_arguments():
     """Manage arguments and help file"""
     parser = argparse.ArgumentParser(
@@ -54,7 +62,6 @@ def validate_hosts(args):
     """Reads in the host or list variable and returns a list of hosts"""
     log = Logger(["VALIDATE HOSTS"], debug_on=args.debug)
     hosts = []
-    valid = []
     if args.host:
         hosts.append(args.host)
     elif args.list:
@@ -70,10 +77,10 @@ def validate_hosts(args):
         try:
             ipaddress.ip_address(host)
             log.debug(f"{host} - Valid IP")
-            valid.append(host)
+            global_arrays.host_list.append(host)
         except ValueError:
             log.error(f"{host} - INVALID IP")
-    return valid
+    return True
 
 
 def supported_switch(s):
@@ -97,14 +104,14 @@ def yaml_loader(filepath, log):
         quit()
 
 
-def print_result(host, type, info, msg, msg_color):
+def print_result(host, status, info, msg, msg_color):
     """print the information from check_upgrade to the user"""
     s_log = Logger(host)
-    if type == "error":
+    if status == "error":
         s_log.error(info, msg, msg_color)
-    elif type == "info":
+    elif status == "info":
         s_log.info(info, msg, msg_color)
-    elif type == "success":
+    elif status == "success":
         s_log.success(info, msg, msg_color)
     else:
         s.log.error("Something went wrong")
@@ -114,12 +121,10 @@ def check_upgrade(s, images, image_path="../images/"):
     """Gathers information from switch and checks it against an images file.
     Will categorise the switch as either ready for file transfer or ready for
     upgrade. Returns both values, one will be empty"""
-    type = "error"
+    status = "error"
     info = "NO INFO"
     msg = "NO MESSAGE"
     msg_color = "red"
-    copy_s = None
-    upgrade_s = None
     try:
         supported_switch(s)
         s.upgradefile = images[s.family()][s.featureset()]["image"]
@@ -127,58 +132,57 @@ def check_upgrade(s, images, image_path="../images/"):
         s.next_version = images[s.family()][s.featureset()]["version"]
         info = f"[{s.family()}][{s.featureset()}][{s.version()}]"
         if not version.parse(s.version()) < version.parse(s.next_version):
-            type = "info"
+            status = "info"
             msg = "No upgrade available"
             msg_color = "white"
         elif s.file_on_flash(s.upgradefile):
-            type = "success"
+            status = "success"
             msg = f"upgrade to {s.next_version} - file already on flash"
             msg_color = "green"
-            upgrade_s = s
+            global_arrays.upgrade_list.append(s)
         elif not os.path.isfile(f"{image_path}{s.upgradefile}"):
-            type = "success"
+            status = "success"
             msg = f"upgrade to {s.next_version} - upgrade file not available"
             msg_color = "red"
         elif not int(os.stat(f"{image_path}{s.upgradefile}").st_size) < int(
                 s.free_space()):
-            type = "success"
+            status = "success"
             msg = f"upgrade to {s.next_version} - not enough space on flash"
             msg_color = "red"
         else:
-            type = "success"
+            status = "success"
             msg = f"upgrade to {s.next_version} - file ready for transfer"
             msg_color = "yellow"
-            copy_s = s
+            global_arrays.copy_list.append(s)
     except SwitchNotSupported as e:
-        type = "error"
+        status = "error"
         info = "Not supported"
         msg = e
         msg_color = "red"
     except netmiko.ssh_exception.NetMikoTimeoutException:
-        type = "error"
+        status = "error"
         info = "Unable to connect"
         msg = "Switch timed out"
         msg_color = "red"
     except KeyError as ke:
-        type = "error"
+        status = "error"
         info = f"[{ke}]"
         msg = "Family not defined, check ../configs/swimages.yml"
         msg_color = "red"
     print_result(
         host=s.host,
-        type=type,
+        status=status,
         info=info,
         msg=msg,
         msg_color=msg_color,
     )
-    return copy_s, upgrade_s
+    return True
 
 
-def copy_file(switch_list, log):
+def copy_file(log):
     """Transfers the s.upgradefile from local directory to switch flash, for a
     list of switches. Returns a list of successful switches."""
-    success = []
-    for switch in switch_list:
+    for switch in global_arrays.copy_list:
         log.info(f"{switch.host} - Preparing to copy file...")
         switch.save_config()
         switch.backup_config()
@@ -186,31 +190,30 @@ def copy_file(switch_list, log):
         if switch.send_file(f"{switch.image_path}{switch.upgradefile}",
                             f"flash:/{switch.upgradefile}"):
             log.success(f"{switch.host} - Copy success")
-            success.append(switch)
+            global_arrays.upgrade_list.append(switch)
         else:
             log.error(f"{switch.host} - Copy failed")
-    return success
+    return True
 
 
-def upgrade_switches(switch_list, log):
+def upgrade_switches(log):
     """Sends an upgrade configuration to a switch, for a list of switches.
     Returns a list of successful switches"""
-    success = []
-    for switch in switch_list:
+    for switch in global_arrays.upgrade_list:
         log.info(f"{switch.host} - Preparing to upgrade...")
         switch.save_config()
         switch.backup_config()
         if switch.send_config(f"boot system flash:/{switch.upgradefile}"):
             log.success(f"{switch.host} - Upgrade success")
-            success.append(switch)
+            global_arrays.reload_list.append(switch)
         else:
             log.error(f"{switch.host} - Upgrade failed")
-    return success
+    return True
 
 
-def reload_switches(switch_list, log):
+def reload_switches(log):
     """Sends a reload command to a switch, for a list of switches"""
-    for switch in switch_list:
+    for switch in global_arrays.reload_list:
         log.info(f"{switch.host} - Preparing to reload...")
         switch.save_config()
         switch.backup_config()
@@ -226,27 +229,18 @@ def main(args):
     file, perform config upgrade or reload a switch"""
     log = Logger("[MAIN]", debug_on=args.debug)
     log.debug("Executing [main]")
-    host_list = validate_hosts(args)
-    copy_list = []
-    upgrade_list = []
-    reload_list = []
+    validate_hosts(args)
     images = yaml_loader("../configs/swimages.yml", log)
     password = getpass.getpass("Password: ")
-    for host in host_list:
+    for host in global_arrays.host_list:
         sw = s(host, args.user, password, debug_on=args.debug)
-        (copy_s, upgrade_s) = check_upgrade(sw, images)
-        if copy_s is not None:
-            copy_list.append(copy_s)
-        if upgrade_s is not None:
-            upgrade_list.append(upgrade_s)
+        check_upgrade(sw, images)
     if args.copy:
-        success = copy_file(copy_list, log)
-        upgrade_list.append(sw), ({} for sw in success)
+        copy_file(log)
     if args.upgrade:
-        success = upgrade_switches(upgrade_list, log)
-        reload_list.append(sw), ({} for sw in success)
+        upgrade_switches(log)
     if args.reload:
-        reload_switches(reload_list, log)
+        reload_switches(log)
 
 
 if __name__ == "__main__":

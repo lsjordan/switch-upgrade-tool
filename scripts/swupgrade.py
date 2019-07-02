@@ -9,9 +9,11 @@ import argparse
 import getpass
 import ipaddress
 import os
+
 import netmiko
 import yaml
 from packaging import version
+
 from logger import Logger
 from netdevices import Switch as s
 
@@ -114,7 +116,7 @@ def print_result(host, status, info, msg, msg_color):
     elif status == "success":
         s_log.success(info, msg, msg_color)
     else:
-        s.log.error("Something went wrong")
+        s_log.error("Something went wrong")
 
 
 def check_upgrade(s, images, image_path="../images/"):

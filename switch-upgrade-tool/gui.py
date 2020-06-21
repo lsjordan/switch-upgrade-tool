@@ -46,10 +46,11 @@ class GUI:
         self.screen.erase()
         self.screen.border(0)
 
-        # now paint the rows
+        # Header
         self.screen.addstr(1, 4, "Switch Upgrade tool running...")
         self.screen.addstr(2, 4, "Liam Jordan, 2020")
 
+        #Hostname
         top = self.topLineNum
         bottom = self.topLineNum + self.height
         for (
@@ -63,6 +64,10 @@ class GUI:
             else:
                 self.screen.addstr(index + self.padding, int(self.width / 4),
                                    line, curses.A_BOLD)
+
+        # Status
+        # todo
+
         self.screen.refresh()
 
     # move highlight up/down one line

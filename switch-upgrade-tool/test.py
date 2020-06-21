@@ -11,13 +11,11 @@ class GUI:
         curses.noecho()
         curses.cbreak()
         self.screen.keypad(1)
+        self.screen.border(0)
         self.topLineNum = 0
-        self.padding = 7
         self.highlightLineNum = 0
-        self.height, self.width = self.screen.getmaxyx()
-        self.height = self.height - (self.padding * 2)
-        self.device_count = 55
-        # self.device_count = len(upgrades)
+        self.markedLineNums = []
+        self.device_count = len(upgrades)
         self.getOutputLines()
         self.run()
 
@@ -34,7 +32,10 @@ class GUI:
                 self.exit()
 
     def getOutputLines(self):
-        """Store switches and statuses"""
+        ### !!!
+        ### This is where you would write a function to parse lines into rows
+        ### and columns. For this demo, I'll just create a bunch of random ints
+        ### !!!
         list1 = []
         for x in range(0, self.device_count):
             list1.append(f"{x} TESTING")
@@ -44,25 +45,22 @@ class GUI:
     def displayScreen(self):
         # clear screen
         self.screen.erase()
-        self.screen.border(0)
 
         # now paint the rows
-        self.screen.addstr(1, 4, "Switch Upgrade tool running...")
-        self.screen.addstr(2, 4, "Liam Jordan, 2020")
-
         top = self.topLineNum
-        bottom = self.topLineNum + self.height
+        bottom = self.topLineNum + curses.LINES
         for (
                 index,
                 line,
         ) in enumerate(self.outputLines[top:bottom]):
+            linenum = self.topLineNum + index
+            line = '%s' % (line, )
+
             # highlight current line
             if index != self.highlightLineNum:
-                self.screen.addstr(index + self.padding, int(self.width / 4),
-                                   line)
+                self.screen.addstr(index, 0, line)
             else:
-                self.screen.addstr(index + self.padding, int(self.width / 4),
-                                   line, curses.A_BOLD)
+                self.screen.addstr(index, 0, line, curses.A_BOLD)
         self.screen.refresh()
 
     # move highlight up/down one line
@@ -73,8 +71,8 @@ class GUI:
         if increment == self.UP and self.highlightLineNum == 0 and self.topLineNum != 0:
             self.topLineNum += self.UP
             return
-        elif increment == self.DOWN and nextLineNum == self.height and (
-                self.topLineNum + self.height) != self.nOutputLines:
+        elif increment == self.DOWN and nextLineNum == curses.LINES and (
+                self.topLineNum + curses.LINES) != self.nOutputLines:
             self.topLineNum += self.DOWN
             return
 
@@ -84,7 +82,7 @@ class GUI:
             self.highlightLineNum = nextLineNum
         elif increment == self.DOWN and (
                 self.topLineNum + self.highlightLineNum + 1
-        ) != self.nOutputLines and self.highlightLineNum != self.height:
+        ) != self.nOutputLines and self.highlightLineNum != curses.LINES:
             self.highlightLineNum = nextLineNum
 
     def restoreScreen(self):
@@ -96,3 +94,7 @@ class GUI:
     # catch any weird termination situations
     def __del__(self):
         self.restoreScreen()
+
+
+if __name__ == '__main__':
+    ih = GUI()

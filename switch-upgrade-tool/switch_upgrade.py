@@ -83,8 +83,7 @@ def main(args):
     upgrades = [Upgrade(switch) for switch in switches]
 
     # start GUI
-    # GUI(upgrades).get_status()  # test
-    GUI(upgrades).start()
+    GUI(upgrades)
 
     # start upgrade workers
     # with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:

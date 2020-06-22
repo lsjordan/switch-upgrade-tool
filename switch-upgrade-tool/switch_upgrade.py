@@ -87,7 +87,7 @@ def main(args):
     mygui = GUI(upgrades)
 
     # start upgrade workers
-    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=11) as executor:
         executor.submit(mygui.run)
         [executor.submit(upgrade.start) for upgrade in upgrades]
 

@@ -45,6 +45,6 @@ class Upgrade(object):
     def start(self):
         """TESTING"""
         for x in range(random.randrange(11, 30)):
-            self.status = f"the number {x}"
+            self.status = f"Counting: {x}"
             time.sleep(0.5)
         self.status = "FINISHED"

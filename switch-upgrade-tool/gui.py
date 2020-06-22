@@ -40,9 +40,6 @@ class GUI(object):
                 self.updown(self.DOWN)
             elif c == self.ESC_KEY:
                 self.exit()
-                raise Exception("USER FORCE QUIT")
-            else:
-                pass
 
     def set_dimensions(self):
         """reads the dimensions of the terminal and sets layout"""
@@ -74,7 +71,7 @@ class GUI(object):
         bottom = self.topLineNum + self.list_height
 
         # Box
-        boxsize = 6
+        boxsize = int(0.15 * self.window_height)
         box = [[boxsize, boxsize],
                [self.window_height - boxsize, self.width - boxsize]]
         textpad.rectangle(self.screen, box[0][0], box[0][1], box[1][0],

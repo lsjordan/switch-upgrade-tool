@@ -14,6 +14,7 @@ Liam Jordan. For support: lsjordan.uk@gmail.com
 An application to upgrade Network Switches
 """
 import argparse
+import concurrent.futures
 import getpass
 import ipaddress
 
@@ -83,11 +84,12 @@ def main(args):
     upgrades = [Upgrade(switch) for switch in switches]
 
     # start GUI
-    GUI(upgrades)
+    mygui = GUI(upgrades)
 
     # start upgrade workers
-    # with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-    #     [executor.submit(upgrade.start) for upgrade in upgrades]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        [executor.submit(upgrade.start) for upgrade in upgrades]
+        executor.submit(mygui.run)
 
 
 if __name__ == "__main__":

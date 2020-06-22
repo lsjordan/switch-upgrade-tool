@@ -1,7 +1,8 @@
 import curses
+import time
 
 
-class GUI:
+class GUI(object):
     DOWN = 1
     UP = -1
     ESC_KEY = 27
@@ -10,21 +11,25 @@ class GUI:
         self.screen = curses.initscr()
         curses.noecho()
         curses.cbreak()
+        self.screen.nodelay(True)
         self.screen.keypad(1)
         self.topLineNum = 0
-        self.padding = 7
         self.highlightLineNum = 0
-        self.height, self.width = self.screen.getmaxyx()
-        self.height = self.height - (self.padding * 2)
-        self.device_count = 55
-        # self.device_count = len(upgrades)
-        self.getOutputLines()
-        self.run()
+        self.output_hosts = []
+        self.output_status = []
+        self.window_height = 0
+        self.list_height = 0
+        self.width = 0
+        self.padding = 0
+        self.upgrades = upgrades
+        self.device_count = len(upgrades)
+        self.set_dimensions()
+        self.get_host_names()
 
     def run(self):
         while True:
             self.displayScreen()
-            # get user command
+            # # get user command
             c = self.screen.getch()
             if c == curses.KEY_UP:
                 self.updown(self.UP)
@@ -32,14 +37,26 @@ class GUI:
                 self.updown(self.DOWN)
             elif c == self.ESC_KEY:
                 self.exit()
+            else:
+                pass
 
-    def getOutputLines(self):
+    def set_dimensions(self):
+        """reads the dimensions of the terminal and sets layout"""
+        self.window_height, self.width = self.screen.getmaxyx()
+        self.padding = int(0.2 * self.window_height)
+        self.list_height = self.window_height - (self.padding * 2)
+        return 0
+
+    def get_status(self):
+        """Read the upgrade statuses"""
+        self.output_status = []
+        for upgrade in self.upgrades:
+            self.output_status.append(upgrade.status)
+
+    def get_host_names(self):
         """Store switches and statuses"""
-        list1 = []
-        for x in range(0, self.device_count):
-            list1.append(f"{x} TESTING")
-        self.outputLines = list1
-        self.nOutputLines = self.device_count
+        for upgrade in self.upgrades:
+            self.output_hosts.append(upgrade.host)
 
     def displayScreen(self):
         # clear screen
@@ -50,13 +67,14 @@ class GUI:
         self.screen.addstr(1, 4, "Switch Upgrade tool running...")
         self.screen.addstr(2, 4, "Liam Jordan, 2020")
 
-        #Hostname
         top = self.topLineNum
-        bottom = self.topLineNum + self.height
+        bottom = self.topLineNum + self.list_height
+
+        #Hostname
         for (
                 index,
                 line,
-        ) in enumerate(self.outputLines[top:bottom]):
+        ) in enumerate(self.output_hosts[top:bottom]):
             # highlight current line
             if index != self.highlightLineNum:
                 self.screen.addstr(index + self.padding, int(self.width / 4),
@@ -64,10 +82,21 @@ class GUI:
             else:
                 self.screen.addstr(index + self.padding, int(self.width / 4),
                                    line, curses.A_BOLD)
-
+        self.get_status()
         # Status
-        # todo
-
+        for (
+                index,
+                line,
+        ) in enumerate(self.output_status[top:bottom]):
+            # highlight current line
+            if index != self.highlightLineNum:
+                self.screen.addstr(index + self.padding,
+                                   int(((self.width / 4) * 3) - len(line)),
+                                   line)
+            else:
+                self.screen.addstr(index + self.padding,
+                                   int(((self.width / 4) * 3) - len(line)),
+                                   line, curses.A_BOLD)
         self.screen.refresh()
 
     # move highlight up/down one line
@@ -78,8 +107,8 @@ class GUI:
         if increment == self.UP and self.highlightLineNum == 0 and self.topLineNum != 0:
             self.topLineNum += self.UP
             return
-        elif increment == self.DOWN and nextLineNum == self.height and (
-                self.topLineNum + self.height) != self.nOutputLines:
+        elif increment == self.DOWN and nextLineNum == self.list_height and (
+                self.topLineNum + self.list_height) != self.device_count:
             self.topLineNum += self.DOWN
             return
 
@@ -89,7 +118,7 @@ class GUI:
             self.highlightLineNum = nextLineNum
         elif increment == self.DOWN and (
                 self.topLineNum + self.highlightLineNum + 1
-        ) != self.nOutputLines and self.highlightLineNum != self.height:
+        ) != self.device_count and self.highlightLineNum != self.list_height:
             self.highlightLineNum = nextLineNum
 
     def restoreScreen(self):

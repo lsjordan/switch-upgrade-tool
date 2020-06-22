@@ -30,10 +30,18 @@
 # phase 6 - validate
 # validate new version
 # end
+import time
 
 
-class Upgrade:
+class Upgrade(object):
     """A class to handle switch upgrade progress"""
     def __init__(self, switch):
         self.switch = switch
+        self.host = switch.host
         self.status = "NOT STARTED"
+
+    def start(self):
+        """TESTING"""
+        for x in range(5):
+            self.status = f"the number {x}"
+            time.sleep(5)

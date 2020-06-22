@@ -1,5 +1,6 @@
 import curses
 import time
+from curses import textpad
 
 
 class GUI(object):
@@ -11,7 +12,9 @@ class GUI(object):
         self.screen = curses.initscr()
         curses.noecho()
         curses.cbreak()
+        curses.curs_set(0)
         self.screen.nodelay(True)
+        self.screen.timeout(150)
         self.screen.keypad(1)
         self.topLineNum = 0
         self.highlightLineNum = 0
@@ -37,6 +40,7 @@ class GUI(object):
                 self.updown(self.DOWN)
             elif c == self.ESC_KEY:
                 self.exit()
+                raise Exception("USER FORCE QUIT")
             else:
                 pass
 
@@ -61,7 +65,6 @@ class GUI(object):
     def displayScreen(self):
         # clear screen
         self.screen.erase()
-        self.screen.border(0)
 
         # Header
         self.screen.addstr(1, 4, "Switch Upgrade tool running...")
@@ -69,6 +72,13 @@ class GUI(object):
 
         top = self.topLineNum
         bottom = self.topLineNum + self.list_height
+
+        # Box
+        boxsize = 6
+        box = [[boxsize, boxsize],
+               [self.window_height - boxsize, self.width - boxsize]]
+        textpad.rectangle(self.screen, box[0][0], box[0][1], box[1][0],
+                          box[1][1])
 
         #Hostname
         for (
@@ -81,7 +91,7 @@ class GUI(object):
                                    line)
             else:
                 self.screen.addstr(index + self.padding, int(self.width / 4),
-                                   line, curses.A_BOLD)
+                                   line, curses.A_STANDOUT)
         self.get_status()
         # Status
         for (
@@ -96,7 +106,7 @@ class GUI(object):
             else:
                 self.screen.addstr(index + self.padding,
                                    int(((self.width / 4) * 3) - len(line)),
-                                   line, curses.A_BOLD)
+                                   line, curses.A_STANDOUT)
         self.screen.refresh()
 
     # move highlight up/down one line

@@ -30,6 +30,8 @@
 # phase 6 - validate
 # validate new version
 # end
+
+import random
 import time
 
 
@@ -42,6 +44,7 @@ class Upgrade(object):
 
     def start(self):
         """TESTING"""
-        for x in range(5):
+        for x in range(random.randrange(11, 30)):
             self.status = f"the number {x}"
-            time.sleep(5)
+            time.sleep(0.5)
+        self.status = "FINISHED"

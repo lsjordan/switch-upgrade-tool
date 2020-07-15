@@ -4,13 +4,13 @@
 
 C2960+:
   lanlite:
-    image: c2960-lanlitek9-mz.152-4.E7.bin
-    MD5: b1ea7d5b7deca43e492282d477d45316
-    version: 15.2(4)E7
+    image: c2960-lanlitek9-mz.152-7.E2.bin
+    MD5: aa3fd37610aa48710ef77f5bf673ecb0
+    version: 15.2(7)E2
   lanbase:
-    image: c2960-lanbasek9-mz.152-4.E7.bin
-    MD5: f9eda18e78ebb046dd8ad75f0f244219
-    version: 15.2(4)E7
+    image: c2960-lanbasek9-mz.152-7.E2.bin
+    MD5: 9fbdc4c0d310501076ae7fc3a958ec0f
+    version: 15.2(7)E2
 
 C2960C:
   universal:
@@ -30,12 +30,18 @@ C2960:
 
 C2960X:
   universal:
-    image: c2960x-universalk9-mz.152-4.E7.bin
-    MD5: a7a2d1754104306a4556326a6f16227f
-    version: 15.2(4)E7
+    image: c2960x-universalk9-mz.152-7.E2.bin
+    MD5: e970106add61fdf03b08391820aa1e20
+    version: 15.2(7)E2
 
 C2960S:
   universal:
     image: c2960s-universalk9-mz.152-2.E9.bin
     MD5: ea604d030b378b6c5c3dda3d501ac2f5
     version: 15.2(2)E9
+
+C2960CX:
+  universal:
+    image: c2960cx-universalk9-mz.152-7.E2.bin
+    MD5: 376fdfa19a1283df087f8113fcf3e776
+    version: 15.2(7)E2

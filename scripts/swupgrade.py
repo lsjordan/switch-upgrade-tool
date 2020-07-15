@@ -100,7 +100,7 @@ def yaml_loader(filepath, log):
     """Load a yaml file"""
     try:
         with open(filepath, "r") as myfile:
-            return yaml.load(myfile)
+            return yaml.load(myfile, Loader=yaml.BaseLoader)
     except FileNotFoundError as e:
         log.error(e)
         quit()

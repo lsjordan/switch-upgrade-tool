@@ -1,2 +1,4 @@
 netmiko
 packaging
+colorama
+termcolor

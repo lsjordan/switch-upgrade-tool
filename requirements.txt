@@ -2,3 +2,4 @@ netmiko
 packaging
 colorama
 termcolor
+pyyaml

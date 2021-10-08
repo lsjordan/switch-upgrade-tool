@@ -1,5 +1,5 @@
 # switch-upgrade-tool
-Network switch OS upgrade tool. Primarily used for Cisco IOS
+Network switch OS upgrade tool. Primarily used for Cisco IOS \n
 Developed by Liam Jordan - Network Engineer for Italik LTD
 
 ## Overview

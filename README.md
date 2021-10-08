@@ -1,4 +1,5 @@
 # switch-upgrade-tool
+Developed by Liam Jordan & Italik LTD
 Network switch OS upgrade tool. Primarily used for Cisco IOS
 
 ## Overview
@@ -22,7 +23,7 @@ optional arguments:
   --debug      Debug logging  
   --help       Show this help msg and exit  
 
-c) 2019 Liam Jordan  
+- 2019 Liam Jordan | Italik LTD
 
 ## /backups/
 Used during the copy, upgrade and reload phases. The switch config is saved to file automatically, the backups directory is the default save location.

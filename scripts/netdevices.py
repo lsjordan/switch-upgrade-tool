@@ -5,12 +5,14 @@ LiamJordan. For support: lsjordan.uk@gmail.com
 A file containing network device classes
 """
 
-from logger import Logger
-from netmiko import ConnectHandler
-import time
 import datetime as dt
+import time
+
 import paramiko
+from netmiko import ConnectHandler
 from scp import SCPClient
+
+from logger import Logger
 
 
 class InvalidConfigCommand(Exception):

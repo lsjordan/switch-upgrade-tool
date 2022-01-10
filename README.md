@@ -22,7 +22,7 @@ optional arguments:
   --debug      Debug logging  
   --help       Show this help msg and exit  
 
--- 2019 Liam Jordan | Italik LTD
+-- 2019 Liam Jordan 
 
 ## /backups/
 Used during the copy, upgrade and reload phases. The switch config is saved to file automatically, the backups directory is the default save location.

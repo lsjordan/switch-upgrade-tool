@@ -1,8 +1,6 @@
 # switch-upgrade-tool
 Network switch OS upgrade tool. Primarily used for Cisco IOS
 
-Developed by Liam Jordan - Network Engineer for Italik LTD
-
 ## Overview
 In the default mode this tool will connect to a switch IP (or list of IP's) and gather all required information about the current OS version. It compares this to a simple config file, and displays if an OS upgrade is required. It also has copy, upgrade and reload modes, which can be used to fully automate the upgrade.
 
